@@ -315,7 +315,7 @@ Raw Events → Normalizer → Clusterer → Correlator → Storage
 5. **WebSocket Server**: Broadcasts incident changes to connected clients
 6. **REST Server**: Handles ingestion and queries with HMAC auth
 
-## 🧪 Testing
+## Testing
 
 Run all tests:
 ```bash
@@ -328,7 +328,7 @@ Run specific test:
 ./build/siem_tests "[normalizer]"
 ```
 
-## 📊 Monitoring
+##  Monitoring
 
 Metrics are automatically collected and stored in MongoDB:
 
@@ -442,6 +442,6 @@ Built with modern C++20, leveraging industry-standard libraries for production r
 ---
 
 **Author**: Mahmoud Berkoti
-**Version**: 1.0.0  
+**Version**: 1.0.0  (more to come)
 **Status**: YC save me
 
