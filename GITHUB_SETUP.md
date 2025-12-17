@@ -2,7 +2,7 @@
 
 This guide helps you prepare AegisMind SIEM for deployment on GitHub.
 
-## 📝 Before You Push to GitHub
+## Before You Push to GitHub
 
 ### 1. Verify Sensitive Files Are Protected
 
@@ -59,7 +59,7 @@ git grep -i "token"
 # Review results - make sure no real secrets are found
 ```
 
-## 🚀 Creating Your GitHub Repository
+## Creating Your GitHub Repository
 
 ### Option 1: New Repository
 
@@ -86,7 +86,7 @@ git clone https://github.com/YOUR_USERNAME/AegisMind.git
 cd AegisMind
 ```
 
-## 📋 Repository Configuration
+## Repository Configuration
 
 ### Add Repository Description
 
@@ -115,7 +115,7 @@ On GitHub, go to your repository settings and add:
    - ✅ Require status checks to pass
    - ✅ Include administrators
 
-## 📄 Update Repository-Specific Information
+## Update Repository-Specific Information
 
 ### Update README.md
 
@@ -142,7 +142,7 @@ git clone https://github.com/YOUR_USERNAME/AegisMind.git
 git clone https://github.com/YourActualUsername/AegisMind.git
 ```
 
-## 🔐 GitHub Security Features
+## GitHub Security Features
 
 ### Enable Security Advisories
 
@@ -170,7 +170,7 @@ If you discover a security vulnerability, please email:
 We'll respond within 48 hours.
 ```
 
-## 📊 Add GitHub Actions (Optional)
+## Add GitHub Actions (Optional)
 
 Create `.github/workflows/build.yml` for CI/CD:
 
@@ -211,7 +211,7 @@ jobs:
       run: cd build && ctest --output-on-failure
 ```
 
-## 📝 Add Issue Templates
+## Add Issue Templates
 
 Create `.github/ISSUE_TEMPLATE/bug_report.md`:
 
@@ -268,7 +268,7 @@ Other solutions you've considered.
 Any other information.
 ```
 
-## ✅ Pre-Push Checklist
+## Pre-Push Checklist
 
 Before pushing to GitHub:
 
@@ -283,7 +283,7 @@ Before pushing to GitHub:
 - [ ] CONTRIBUTING.md has your guidelines
 - [ ] All documentation is up to date
 
-## 🎉 Push to GitHub
+## Push to GitHub
 
 ```bash
 # Stage all changes
@@ -296,14 +296,14 @@ git commit -m "Prepare for GitHub deployment with security configurations"
 git push -u origin main
 ```
 
-## 📢 After Publishing
+## After Publishing
 
 ### Update Your Profile README (Optional)
 
 Add to your GitHub profile:
 
 ```markdown
-## 🛡️ AegisMind SIEM
+## AegisMind SIEM
 
 Production-grade real-time Security Information and Event Management system.
 
@@ -325,7 +325,7 @@ Production-grade real-time Security Information and Event Management system.
 - Respond to issues
 - Keep dependencies updated
 
-## 🔒 Ongoing Security Maintenance
+## Ongoing Security Maintenance
 
 ### Regular Security Checks
 
@@ -349,7 +349,7 @@ When you make changes:
 - Tag releases: `git tag v1.0.0 && git push --tags`
 - Write release notes
 
-## 🆘 Emergency: Secret Leaked
+## Emergency: Secret Leaked
 
 If you accidentally commit a secret:
 
@@ -375,7 +375,7 @@ If you accidentally commit a secret:
    - How it was addressed
    - Prevention measures
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [GitHub Security Best Practices](https://docs.github.com/en/code-security)
 - [Git Secrets Prevention](https://git-secret.io/)
@@ -384,4 +384,3 @@ If you accidentally commit a secret:
 ---
 
 **Remember: Once code is pushed to GitHub, assume it's public forever, even if the repository is private.**
-

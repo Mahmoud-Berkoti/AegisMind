@@ -2,7 +2,7 @@
 
 This guide walks you through deploying AegisMind SIEM from GitHub to your own environment.
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have:
 
@@ -13,14 +13,14 @@ Before you begin, ensure you have:
 - [ ] vcpkg for dependency management
 - [ ] Node.js 16+ (for UI)
 
-## 🚀 Step 1: Clone the Repository
+## Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/AegisMind.git
 cd AegisMind
 ```
 
-## 🔐 Step 2: Configure Security (CRITICAL!)
+## Step 2: Configure Security (CRITICAL!)
 
 ### Create Configuration File
 
@@ -51,9 +51,9 @@ security:
   max_body_size: 1048576
 ```
 
-**⚠️ IMPORTANT:** Never commit `config/app.yaml` to version control! It's already in `.gitignore`.
+**IMPORTANT:** Never commit `config/app.yaml` to version control! It's already in `.gitignore`.
 
-## 🗄️ Step 3: Set Up MongoDB
+## Step 3: Set Up MongoDB
 
 ### Option A: Docker (Recommended for Local Development)
 
@@ -86,7 +86,7 @@ mongo:
   db: "cog_siem"
 ```
 
-## 🛠️ Step 4: Build the Backend
+## Step 4: Build the Backend
 
 ### Install vcpkg (if not already installed)
 
@@ -125,14 +125,14 @@ This will:
 - Compile the SIEM backend
 - Run unit tests
 
-## 🎨 Step 5: Set Up the UI
+## Step 5: Set Up the UI
 
 ```bash
 cd ui
 npm install
 ```
 
-## ▶️ Step 6: Start the System
+## Step 6: Start the System
 
 ### Start Backend
 
@@ -182,7 +182,7 @@ npm run dev
 
 The UI will start at `http://localhost:5173` (or `http://localhost:3001` if 5173 is busy).
 
-## ✅ Step 7: Verify Everything Works
+## Step 7: Verify Everything Works
 
 1. **Open the UI**: Navigate to `http://localhost:5173` (or the port shown)
 2. **Check Dashboard**: You should see the AegisMind home page
@@ -190,7 +190,7 @@ The UI will start at `http://localhost:5173` (or `http://localhost:3001` if 5173
 4. **WebSocket Connection**: Check the footer - should show "WebSocket: Connected"
 5. **Live Updates**: If you seeded demo data, incidents should appear
 
-## 🌐 Production Deployment
+## Production Deployment
 
 ### Additional Steps for Production
 
@@ -268,7 +268,7 @@ The UI will start at `http://localhost:5173` (or `http://localhost:3001` if 5173
    sudo ufw allow from 192.168.1.0/24 to any port 8080
    ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Backend Won't Start
 
@@ -321,7 +321,7 @@ docker exec siem-mongodb mongosh --eval "rs.initiate()"
 2. Check MongoDB: `docker exec siem-mongodb mongosh cog_siem --eval "db.incidents.count()"`
 3. Check WebSocket in browser console (F12)
 
-## 📊 Monitoring
+## Monitoring
 
 ### Log Files
 
@@ -362,7 +362,7 @@ top -p $(pgrep siemd)
 netstat -tlnp | grep -E '8080|8081'
 ```
 
-## 🔄 Updating
+## Updating
 
 To update to the latest version:
 
@@ -384,13 +384,13 @@ npm run build
 # Restart services
 ```
 
-## 📞 Support
+## Support
 
 - **Documentation**: See [README.md](README.md) and [SECURITY.md](SECURITY.md)
 - **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/AegisMind/issues)
 - **Security**: See [SECURITY.md](SECURITY.md) for security concerns
 
-## ✅ Post-Deployment Checklist
+## Post-Deployment Checklist
 
 After deployment, verify:
 
@@ -407,7 +407,7 @@ After deployment, verify:
 - [ ] Backups are configured
 - [ ] Documentation is updated with your specifics
 
-## 🎉 Success!
+## Success!
 
 You now have a fully deployed AegisMind SIEM system! Visit the UI to start monitoring security incidents in real-time.
 
@@ -419,4 +419,3 @@ You now have a fully deployed AegisMind SIEM system! Visit the UI to start monit
 3. Set up alerting and notifications
 4. Customize correlation rules
 5. Train your team on the platform
-

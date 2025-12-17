@@ -2,13 +2,13 @@
 
 This document explains how to securely configure AegisMind SIEM for deployment.
 
-## ⚠️ Important: Before You Deploy
+## Important: Before You Deploy
 
 **NEVER commit sensitive credentials to version control!**
 
 The repository includes example configuration files. You must create your own configuration with secure credentials.
 
-## 🔐 Initial Setup
+## Initial Setup
 
 ### 1. Create Your Configuration File
 
@@ -52,7 +52,7 @@ security:
   max_body_size: 1048576
 ```
 
-## 🗄️ MongoDB Security
+## MongoDB Security
 
 ### Local Development
 
@@ -92,7 +92,7 @@ For production, use a secure MongoDB instance:
 - [ ] Regular backups of incident data
 - [ ] Set appropriate retention policies
 
-## 🌐 Network Security
+## Network Security
 
 ### Server Configuration
 
@@ -118,7 +118,7 @@ sudo ufw allow from 192.168.1.0/24 to any port 8080
 sudo ufw allow from 192.168.1.0/24 to any port 8081
 ```
 
-## 🔑 API Authentication
+## API Authentication
 
 ### HMAC Signature Authentication
 
@@ -154,7 +154,7 @@ headers = {
 }
 ```
 
-## 🔒 Production Deployment Checklist
+## Production Deployment Checklist
 
 Before deploying to production:
 
@@ -194,7 +194,7 @@ Before deploying to production:
 - [ ] Regular security updates
 - [ ] Penetration testing
 
-## 🚨 Security Threats & Mitigations
+## Security Threats & Mitigations
 
 | Threat | Mitigation |
 |--------|-----------|
@@ -207,7 +207,7 @@ Before deploying to production:
 | **Unauthorized Access** | Firewall rules, network isolation |
 | **SQL Injection** | MongoDB (NoSQL), parameterized queries |
 
-## 🔍 Monitoring & Auditing
+## Monitoring & Auditing
 
 ### Audit Trail
 
@@ -241,7 +241,7 @@ db.metrics_ts.find({
 }).sort({ts: -1})
 ```
 
-## 📞 Security Incident Response
+## Security Incident Response
 
 If you suspect a security breach:
 
@@ -269,14 +269,14 @@ If you suspect a security breach:
    - Implement additional controls
    - Train team on lessons learned
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [MongoDB Security Checklist](https://docs.mongodb.com/manual/administration/security-checklist/)
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
 - [CIS Controls](https://www.cisecurity.org/controls/)
 
-## 🤝 Reporting Security Issues
+## Reporting Security Issues
 
 If you discover a security vulnerability, please email:
 - **Do NOT** create a public GitHub issue
@@ -287,4 +287,3 @@ If you discover a security vulnerability, please email:
 ---
 
 **Remember: Security is a process, not a product. Regularly review and update your security configurations.**
-

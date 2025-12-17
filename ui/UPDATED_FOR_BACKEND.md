@@ -2,7 +2,7 @@
 
 The dashboard has been completely redesigned to work with your **Cognitive SIEM** backend!
 
-## 🔄 What Changed
+## What Changed
 
 ### Before (Generic Employee Device Dashboard)
 - ❌ Employee/Contingent devices
@@ -18,7 +18,7 @@ The dashboard has been completely redesigned to work with your **Cognitive SIEM*
 - ✅ **Live updates** via WebSocket
 - ✅ **Matches your C++ schemas exactly**
 
-## 📊 Current Dashboard Features
+## Current Dashboard Features
 
 ### Stats Row (Top)
 - **Total Incidents**: Count of all incidents
@@ -45,7 +45,7 @@ The dashboard has been completely redesigned to work with your **Cognitive SIEM*
   - Fingerprint
   - Link to incident (if correlated)
 
-## 🔌 Backend Integration
+## Backend Integration
 
 ### Mock Mode (Current)
 ```bash
@@ -104,7 +104,7 @@ PUT  /incidents/:id/status - Update status
 }
 ```
 
-## 🎨 Visual Design
+## Visual Design
 
 ### Color Scheme
 - **Background**: `#0E1014` (dark)
@@ -122,7 +122,7 @@ PUT  /incidents/:id/status - Update status
 - **Ack**: Yellow (acknowledged)
 - **Closed**: Green (resolved)
 
-## 📁 Key Files Changed
+## Key Files Changed
 
 ```
 ui/src/
@@ -140,7 +140,7 @@ ui/src/
 └── main.tsx              ✅ Updated entry point
 ```
 
-## 🚀 Testing with Real Backend
+## Testing with Real Backend
 
 ### Step 1: Start C++ SIEM
 ```powershell
@@ -184,7 +184,7 @@ cd C:\Users\mberk\Desktop\AegisMind
 - Click the **Live** button (top right)
 - New incidents will appear in real-time!
 
-## 🔍 Data Flow
+## Data Flow
 
 ```
 1. Events ingested → POST /ingest
@@ -198,7 +198,7 @@ cd C:\Users\mberk\Desktop\AegisMind
 5. UI receives update and displays
 ```
 
-## 🎯 Next Steps
+## Next Steps
 
 1. **Test with mock data** (current state) ✅
 2. **Start your C++ backend**
@@ -206,7 +206,7 @@ cd C:\Users\mberk\Desktop\AegisMind
 4. **Seed real incidents** with `seed_demo_data.exe`
 5. **Watch live updates** in the dashboard
 
-## 📝 Sample Incident Types
+## Sample Incident Types
 
 The mock data includes realistic incidents:
 - Multiple failed SSH login attempts
@@ -223,7 +223,7 @@ The mock data includes realistic incidents:
 
 All matching real security scenarios your SIEM would detect!
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Dashboard shows "Failed to load data"
 - ✅ Check C++ backend is running
@@ -242,7 +242,6 @@ All matching real security scenarios your SIEM would detect!
 
 ---
 
-**Your dashboard now perfectly matches your C++ SIEM backend!** 🎉
+**Your dashboard now perfectly matches your C++ SIEM backend!**
 
 Open http://localhost:3000 to see it in action!
-

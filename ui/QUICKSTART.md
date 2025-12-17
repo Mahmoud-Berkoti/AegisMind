@@ -157,5 +157,4 @@ ui/
 - Review component tests in `src/components/__tests__/`
 - Inspect mock data in `src/mocks/data.ts`
 
-Enjoy your SIEM dashboard! 🚀
-
+Enjoy your SIEM dashboard!

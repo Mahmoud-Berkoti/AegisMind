@@ -78,7 +78,7 @@ A **production-grade, pixel-perfect SIEM dashboard** that matches the provided "
 - 768-1023px: Single column, map above charts
 - <768px: Compact headers, reduced legends
 
-## 📁 Complete File Structure
+## Complete File Structure
 
 ```
 ui/
@@ -114,7 +114,7 @@ ui/
 │   │   ├── ws.ts                   # WebSocket client
 │   │   ├── colors.ts               # Color constants
 │   │   ├── format.ts               # Number/time formatting
-│   │   └── perf.ts                 # Performance utilities
+│   │   ├── perf.ts                 # Performance utilities
 │   ├── mocks/
 │   │   ├── server.ts               # Mock API server
 │   │   └── data.ts                 # Mock data generation
@@ -137,7 +137,7 @@ ui/
 └── PROJECT_SUMMARY.md              # This file
 ```
 
-## 🎨 Design System
+## Design System
 
 ### Color Palette
 - Background: `#0E1014`
@@ -165,7 +165,7 @@ ui/
 - Panel padding: 16px
 - Shadow: `0 8px 24px rgba(0, 0, 0, 0.35)`
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 cd ui
@@ -175,7 +175,7 @@ pnpm dev
 
 Dashboard opens at **http://localhost:3000**
 
-## 📊 Component Breakdown
+## Component Breakdown
 
 ### KpiCard
 - Props: `kpi`, `color`, `onClick?`
@@ -202,7 +202,7 @@ Dashboard opens at **http://localhost:3000**
 - Features: Animated fill, marker label, status indicator
 - Animation: 300ms ease-out
 
-## 🔌 API Integration
+## API Integration
 
 ### REST Endpoints
 ```
@@ -220,7 +220,7 @@ GET /v1/incidents?earliest&latest&page&limit&filters
 {"type": "incident.upsert", "doc": {...}}
 ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 pnpm test              # Run all tests
@@ -235,7 +235,7 @@ pnpm test -- --coverage # Coverage report
 - Filters: Active count, clear functionality
 - Drawer: Open/close, keyboard, backdrop
 
-## 📦 Production Build
+## Production Build
 
 ```bash
 pnpm build
@@ -244,7 +244,7 @@ pnpm preview
 
 Output in `dist/` - ready for deployment to any static host (Vercel, Netlify, S3, etc.)
 
-## ⚡ Performance Metrics
+## Performance Metrics
 
 - **First Contentful Paint**: <1.5s (target met)
 - **Chart Render Time**: <16ms with 10k points (60fps maintained)
@@ -252,7 +252,7 @@ Output in `dist/` - ready for deployment to any static host (Vercel, Netlify, S3
 - **Animation Duration**: 150-300ms (smooth, respects reduced motion)
 - **Bundle Size**: Optimized with Vite tree-shaking and code splitting
 
-## ♿ Accessibility Checklist
+## Accessibility Checklist
 
 - ✅ All interactive elements keyboard navigable
 - ✅ Proper focus management
@@ -263,7 +263,7 @@ Output in `dist/` - ready for deployment to any static host (Vercel, Netlify, S3
 - ✅ Respects prefers-reduced-motion
 - ✅ Semantic HTML
 
-## 🎯 Key Achievements
+## Key Achievements
 
 1. **Pixel-perfect layout** matching the reference design
 2. **Real-time WebSocket** updates with automatic reconnection
@@ -274,7 +274,7 @@ Output in `dist/` - ready for deployment to any static host (Vercel, Netlify, S3
 7. **Comprehensive tests** with 80%+ coverage
 8. **Production-ready** build configuration
 
-## 🔧 Technologies Used
+## Technologies Used
 
 | Category | Technology | Purpose |
 |----------|-----------|---------|
@@ -288,7 +288,7 @@ Output in `dist/` - ready for deployment to any static host (Vercel, Netlify, S3
 | Routing | React Router | Page navigation |
 | Testing | Vitest + RTL | Unit & integration tests |
 
-## 📝 Next Steps
+## Next Steps
 
 - Deploy to production
 - Connect to real C++ backend
@@ -304,4 +304,3 @@ Output in `dist/` - ready for deployment to any static host (Vercel, Netlify, S3
 **Status**: ✅ **Complete & Ready for Production**
 
 All requirements met. Dashboard is fully functional, tested, accessible, and performant.
-
