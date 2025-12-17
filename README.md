@@ -1,6 +1,6 @@
 # Cognitive SIEM
 
-A production-grade, real-time Security Information and Event Management (SIEM) system built with modern C++20. Features intelligent event clustering, incident correlation, and live WebSocket updates powered by MongoDB change streams.
+A real-time Security Information and Event Management (SIEM) system built with modern C++20. Features intelligent event clustering, incident correlation, and live WebSocket updates powered by MongoDB change streams.
 
 ##  Security Notice
 
