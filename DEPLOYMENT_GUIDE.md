@@ -81,9 +81,9 @@ You should see `"stateStr": "PRIMARY"` in the output.
 
 Update `config/app.yaml`:
 ```yaml
-mongo:
-  uri: "mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority"
-  db: "cog_siem"
+   mongo:
+     uri: "mongodb+srv://<your_username>:<your_password>@<your_cluster_address>/?retryWrites=true&w=majority"
+     db: "cog_siem"
 ```
 
 ## Step 4: Build the Backend

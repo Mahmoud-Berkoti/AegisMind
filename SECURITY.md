@@ -71,14 +71,14 @@ For production, use a secure MongoDB instance:
 1. **MongoDB Atlas (Recommended)**
    ```yaml
    mongo:
-     uri: "mongodb+srv://USERNAME:PASSWORD@cluster.mongodb.net/?retryWrites=true&w=majority"
+     uri: "mongodb+srv://<YOUR_USERNAME>:<YOUR_PASSWORD>@<YOUR_CLUSTER_ADDRESS>/?retryWrites=true&w=majority"
      db: "cog_siem"
    ```
 
 2. **Self-Hosted with Authentication**
    ```yaml
    mongo:
-     uri: "mongodb://username:password@host:27017/cog_siem?authSource=admin&replicaSet=rs0&tls=true"
+     uri: "mongodb://<username>:<password>@<host>:27017/cog_siem?authSource=admin&replicaSet=rs0&tls=true"
      db: "cog_siem"
    ```
 
