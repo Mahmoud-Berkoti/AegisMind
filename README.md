@@ -2,7 +2,7 @@
 
 A production-grade, real-time Security Information and Event Management (SIEM) system built with modern C++20. Features intelligent event clustering, incident correlation, and live WebSocket updates powered by MongoDB change streams.
 
-## ⚠️ Security Notice
+##  Security Notice
 
 **IMPORTANT:** Before deploying this project:
 
@@ -14,7 +14,7 @@ A production-grade, real-time Security Information and Event Management (SIEM) s
 
 The example configuration files contain placeholder values that **MUST** be changed before deployment.
 
-## 🎯 Features
+##  Features
 
 - **Real-time Event Processing**: Ingest, normalize, and process security events in near real-time
 - **Intelligent Clustering**: Locality-sensitive hashing with Jaccard/Cosine similarity for event grouping
@@ -26,7 +26,7 @@ The example configuration files contain placeholder values that **MUST** be chan
 - **Metrics Collection**: Performance monitoring and operational metrics
 - **Minimal & Fast**: Production-ready C++20 codebase optimized for performance
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **C++20 compatible compiler** (GCC 11+, Clang 13+, MSVC 2019+)
 - **CMake** 3.20+
@@ -34,7 +34,7 @@ The example configuration files contain placeholder values that **MUST** be chan
 - **MongoDB** 4.4+ with replica set enabled
 - **Git**
 
-## 🛠️ Dependencies
+## Dependencies
 
 All dependencies are managed via vcpkg:
 
@@ -47,9 +47,9 @@ All dependencies are managed via vcpkg:
 - `openssl` - Cryptography (HMAC)
 - `catch2` - Unit testing
 
-## 🚀 Quick Start
+##  Quick Start
 
-> **⚠️ First Time Setup?** Follow the [Deployment Guide](DEPLOYMENT_GUIDE.md) for detailed instructions.
+> **First Time Setup?** Follow the [Deployment Guide](DEPLOYMENT_GUIDE.md) for detailed instructions.
 
 ### 1. Configure Security (Required!)
 
@@ -131,7 +131,7 @@ python3 -m http.server 8000 --directory ui/static
 
 Then navigate to `http://localhost:8000`
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 .
@@ -172,9 +172,9 @@ Then navigate to `http://localhost:8000`
 └── README.md
 ```
 
-## 🔧 Configuration
+##  Configuration
 
-**⚠️ IMPORTANT:** Copy `config/app.yaml.example` to `config/app.yaml` and customize it.
+** IMPORTANT:** Copy `config/app.yaml.example` to `config/app.yaml` and customize it.
 
 ```bash
 cp config/app.yaml.example config/app.yaml
@@ -209,14 +209,14 @@ security:
   max_body_size: 1048576
 ```
 
-**🔐 Security Configuration:**
+** Security Configuration:**
 - Generate a strong HMAC secret (see [SECURITY.md](SECURITY.md))
 - Never commit `config/app.yaml` to version control
 - Review all settings before production deployment
 
 See the [Deployment Guide](DEPLOYMENT_GUIDE.md) for detailed configuration instructions.
 
-## 📡 API Reference
+##  API Reference
 
 ### REST Endpoints
 
@@ -290,7 +290,7 @@ Connect to `ws://localhost:8081/stream`
 }
 ```
 
-## 🏗️ Architecture
+##  Architecture
 
 ### Event Flow
 
@@ -342,9 +342,9 @@ Query metrics:
 db.metrics_ts.find().sort({ts: -1}).limit(100)
 ```
 
-## 🔒 Security
+##  Security
 
-**⚠️ READ BEFORE DEPLOYING:** [Security Configuration Guide](SECURITY.md)
+** READ BEFORE DEPLOYING:** [Security Configuration Guide](SECURITY.md)
 
 ### Security Features
 
@@ -378,7 +378,7 @@ db.metrics_ts.find().sort({ts: -1}).limit(100)
 
 **The actual configuration files are in `.gitignore` to protect your secrets.**
 
-## 🚨 Threat Model (STRIDE)
+##  Threat Model (STRIDE)
 
 | Threat | Mitigation |
 |--------|------------|
@@ -388,14 +388,14 @@ db.metrics_ts.find().sort({ts: -1}).limit(100)
 | DoS | Rate limiting, queue bounds, sampling |
 | Info leak | Field allowlist, PII redaction |
 
-## 📈 Performance
+##  Performance
 
 - **Throughput**: 10,000+ events/minute
 - **Latency**: P99 < 200ms for WebSocket broadcast
 - **Resource Usage**: ≤2 CPU cores, ≤2GB RAM
 - **Storage**: Time-series with automatic TTL
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### MongoDB Connection Failed
 ```bash
@@ -416,11 +416,11 @@ docker exec -it mongo-siem mongosh --eval "rs.initiate()"
 - Check logs: `tail -f logs/siem.log`
 - Verify MongoDB has data: `db.incidents.find()`
 
-## 📝 License
+##  License
 
 MIT License - see LICENSE file for details
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -428,20 +428,20 @@ MIT License - see LICENSE file for details
 4. Push to the branch
 5. Open a Pull Request
 
-## 📚 Further Reading
+##  Further Reading
 
 - [MongoDB Change Streams](https://docs.mongodb.com/manual/changeStreams/)
 - [Boost.Beast](https://www.boost.org/doc/libs/release/libs/beast/)
 - [C++20 Features](https://en.cppreference.com/w/cpp/20)
 - [SIEM Best Practices](https://www.sans.org/reading-room/whitepapers/logging/)
 
-## 🎉 Acknowledgments
+##  Acknowledgments
 
 Built with modern C++20, leveraging industry-standard libraries for production reliability.
 
 ---
 
-**Author**: Cognitive SIEM Team  
+**Author**: Mahmoud Berkoti
 **Version**: 1.0.0  
-**Status**: Production Ready
+**Status**: YC save me
 
