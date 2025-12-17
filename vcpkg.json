@@ -1,0 +1,17 @@
+{
+  "name": "cognitive-siem",
+  "version": "1.0.0",
+  "dependencies": [
+    "mongo-cxx-driver",
+    "boost-beast",
+    "boost-asio",
+    "spdlog",
+    "nlohmann-json",
+    "cli11",
+    "yaml-cpp",
+    "openssl",
+    "catch2"
+  ]
+}
+
+
