@@ -1,0 +1,58 @@
+# AegisMind SIEM Configuration Example
+# Copy this file to app.yaml and customize with your settings
+# For environment variables, the application will use .env values if available
+
+mongo:
+  # MongoDB connection URI with replica set
+  # IMPORTANT: Change this to your own MongoDB instance
+  uri: "mongodb://localhost:27017/?replicaSet=rs0"
+  db: "cog_siem"
+
+server:
+  # WebSocket port for real-time incident streaming
+  ws_port: 8081
+  
+  # REST API port for queries and ingestion
+  rest_port: 8080
+  
+  # Bind address (use 127.0.0.1 for localhost only, 0.0.0.0 for all interfaces)
+  bind_address: "0.0.0.0"
+
+clustering:
+  # Time window for grouping similar events (seconds)
+  window_seconds: 120
+  
+  # Minimum events to form a cluster
+  min_events: 5
+  
+  # Similarity threshold (0.0 to 1.0) for clustering
+  similarity_threshold: 0.75
+
+retention:
+  # Days to retain events (set lower for production to save storage)
+  events_days: 14
+
+logging:
+  # Log level: debug, info, warn, error
+  level: "info"
+  
+  # Log file location
+  file: "logs/siem.log"
+
+security:
+  # CRITICAL: Change this secret before deployment!
+  # Generate with: openssl rand -base64 32
+  # This is used for HMAC authentication of ingest requests
+  hmac_secret: "PLEASE_CHANGE_THIS_SECRET_BEFORE_USE"
+  
+  # Maximum HTTP body size (bytes)
+  max_body_size: 1048576
+
+rate_limiting:
+  # Maximum events per minute to prevent overload
+  max_events_per_minute: 10000
+  
+  # Internal buffer size
+  buffer_size: 50000
+
+
