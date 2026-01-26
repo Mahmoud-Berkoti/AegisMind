@@ -1,0 +1,295 @@
+#include "core/event_normalizer.hpp"
+#include "core/incident_clusterer.hpp"
+#include "core/correlation.hpp"
+#include "storage/mongo.hpp"
+#include "storage/change_stream.hpp"
+#include "ingest/file_ingestor.hpp"
+#include "ingest/http_ingestor.hpp"
+#include "api/websocket_server.hpp"
+#include "api/rest_server.hpp"
+#include "audit/auditor.hpp"
+#include "metrics/metrics.hpp"
+
+#include <CLI/CLI.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/rotating_file_sink.h>
+#include <yaml-cpp/yaml.h>
+
+#include <csignal>
+#include <atomic>
+#include <thread>
+#include <iostream>
+
+using namespace siem;
+
+// Global shutdown flag
+std::atomic<bool> shutdown_requested{false};
+
+void signal_handler(int signal) {
+    if (signal == SIGINT || signal == SIGTERM) {
+        spdlog::info(R"({{"msg":"shutdown_requested","signal":{}}})", signal);
+        shutdown_requested.store(true);
+    }
+}
+
+struct AppConfig {
+    storage::MongoStorage::Config mongo;
+    unsigned short websocket_port = 8081;
+    api::RESTServer::Config rest;
+    core::IncidentClusterer::Config clustering;
+    core::CorrelationEngine::Config correlation;
+    ingest::HTTPIngestor::Config http_ingest;
+    std::string log_level = "info";
+    std::string log_file = "logs/siem.log";
+};
+
+AppConfig load_config(const std::string& config_path) {
+    YAML::Node yaml = YAML::LoadFile(config_path);
+    
+    AppConfig config;
+    
+    // MongoDB
+    if (yaml["mongo"]) {
+        config.mongo.uri = yaml["mongo"]["uri"].as<std::string>();
+        config.mongo.db_name = yaml["mongo"]["db"].as<std::string>();
+    }
+    
+    // Server
+    if (yaml["server"]) {
+        config.websocket_port = yaml["server"]["ws_port"].as<unsigned short>();
+        config.rest.port = yaml["server"]["rest_port"].as<unsigned short>();
+        config.rest.bind_address = yaml["server"]["bind_address"].as<std::string>("0.0.0.0");
+    }
+    
+    // Clustering
+    if (yaml["clustering"]) {
+        config.clustering.window_seconds = yaml["clustering"]["window_seconds"].as<int>();
+        config.clustering.min_events = yaml["clustering"]["min_events"].as<int>();
+        config.clustering.similarity_threshold = yaml["clustering"]["similarity_threshold"].as<double>();
+    }
+    
+    // Correlation
+    if (yaml["correlation"]) {
+        config.correlation.window_seconds = yaml["clustering"]["window_seconds"].as<int>();
+    }
+    
+    // Retention
+    if (yaml["retention"]) {
+        config.mongo.retention_days = yaml["retention"]["events_days"].as<int>();
+    }
+    
+    // Logging
+    if (yaml["logging"]) {
+        config.log_level = yaml["logging"]["level"].as<std::string>();
+        config.log_file = yaml["logging"]["file"].as<std::string>();
+    }
+    
+    // Security
+    if (yaml["security"]) {
+        config.http_ingest.hmac_secret = yaml["security"]["hmac_secret"].as<std::string>();
+        config.http_ingest.max_body_size = yaml["security"]["max_body_size"].as<size_t>();
+    }
+    
+    return config;
+}
+
+void setup_logging(const AppConfig& config) {
+    // Set log level
+    if (config.log_level == "debug") {
+        spdlog::set_level(spdlog::level::debug);
+    } else if (config.log_level == "info") {
+        spdlog::set_level(spdlog::level::info);
+    } else if (config.log_level == "warn") {
+        spdlog::set_level(spdlog::level::warn);
+    } else if (config.log_level == "error") {
+        spdlog::set_level(spdlog::level::err);
+    }
+    
+    // Create rotating file sink
+    try {
+        auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+            config.log_file, 1024 * 1024 * 10, 7);
+        auto logger = std::make_shared<spdlog::logger>("siem", file_sink);
+        spdlog::set_default_logger(logger);
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to create log file: {}", e.what());
+    }
+    
+    spdlog::info(R"({{"msg":"logging_initialized","level":"{}","file":"{}"}})");
+}
+
+int main(int argc, char** argv) {
+    CLI::App app{"Cognitive SIEM - Real-time Security Incident & Event Manager"};
+    
+    std::string config_path = "config/app.yaml";
+    app.add_option("-c,--config", config_path, "Configuration file path")
+        ->default_val(config_path);
+    
+    CLI11_PARSE(app, argc, argv);
+    
+    try {
+        // Load configuration
+        spdlog::info(R"({{"msg":"loading_config","path":"{}"}})");
+        AppConfig config = load_config(config_path);
+        setup_logging(config);
+        
+        spdlog::info(R"({{"msg":"starting_siem","version":"1.0.0"}})");
+        
+        // Initialize components
+        storage::MongoStorage mongo_storage(config.mongo);
+        mongo_storage.initialize();
+        
+        core::EventNormalizer normalizer;
+        core::IncidentClusterer clusterer(config.clustering);
+        core::CorrelationEngine correlator(config.correlation);
+        ingest::HTTPIngestor http_ingestor(config.http_ingest);
+        audit::Auditor auditor(mongo_storage);
+        metrics::MetricsCollector metrics(mongo_storage);
+        
+        // In-memory incident cache
+        std::map<std::string, storage::Incident> incident_cache;
+        std::mutex cache_mutex;
+        
+        // WebSocket server
+        api::WebSocketServer ws_server(config.websocket_port);
+        
+        // Change stream watcher
+        storage::ChangeStreamWatcher change_watcher(mongo_storage);
+        change_watcher.start([&ws_server](const json& change) {
+            // Broadcast incident changes to all WebSocket clients
+            ws_server.broadcast(change);
+            spdlog::debug(R"({{"msg":"change_broadcasted","type":"{}"}})");
+        });
+        
+        // Event processing pipeline
+        auto process_events = [&](const std::vector<json>& raw_events) {
+            metrics::ScopedTimer timer(metrics, "ingest_batch");
+            
+            try {
+                // Normalize
+                auto events = normalizer.normalize_batch(raw_events);
+                metrics.increment("events_ingested_total");
+                
+                // Cluster
+                {
+                    metrics::ScopedTimer cluster_timer(metrics, "cluster_assign");
+                    clusterer.assign_clusters(events);
+                }
+                
+                // Correlate
+                std::vector<std::string> affected_incident_ids;
+                {
+                    std::lock_guard<std::mutex> lock(cache_mutex);
+                    affected_incident_ids = correlator.correlate_events(events, incident_cache);
+                    
+                    // Update events with incident IDs
+                    for (auto& event : events) {
+                        for (const auto& inc_id : affected_incident_ids) {
+                            if (incident_cache.count(inc_id)) {
+                                const auto& inc = incident_cache[inc_id];
+                                // Check if event belongs to this incident
+                                if (event.cluster_id.has_value()) {
+                                    auto it = std::find(inc.cluster_ids.begin(), 
+                                                       inc.cluster_ids.end(), 
+                                                       *event.cluster_id);
+                                    if (it != inc.cluster_ids.end()) {
+                                        event.incident_id = inc_id;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Store events
+                mongo_storage.insert_events(events);
+                
+                // Store incidents
+                {
+                    std::lock_guard<std::mutex> lock(cache_mutex);
+                    for (const auto& inc_id : affected_incident_ids) {
+                        if (incident_cache.count(inc_id)) {
+                            mongo_storage.upsert_incident(incident_cache[inc_id]);
+                            
+                            // Check for alerting conditions
+                            const auto& inc = incident_cache[inc_id];
+                            if (inc.scores.count("anomaly") && inc.scores.at("anomaly") >= 0.9) {
+                                if (inc.severity == storage::Severity::High || 
+                                    inc.severity == storage::Severity::Critical) {
+                                    
+                                    storage::Alert alert;
+                                    alert.incident_id = inc_id;
+                                    alert.ts = std::chrono::system_clock::now();
+                                    alert.action = storage::AlertAction::Notify;
+                                    alert.reason = "anomaly>=0.9";
+                                    alert.result = "success";
+                                    
+                                    mongo_storage.insert_alert(alert);
+                                    spdlog::warn(R"({{"msg":"alert_triggered","incident_id":"{}","severity":"{}"}})");
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                spdlog::info(R"({{"msg":"batch_processed","events":{},"incidents":{}}})",
+                           events.size(), affected_incident_ids.size());
+                
+            } catch (const std::exception& e) {
+                spdlog::error(R"({{"msg":"processing_error","error":"{}"}})", e.what());
+            }
+        };
+        
+        // REST server
+        api::RESTServer rest_server(config.rest, mongo_storage, http_ingestor);
+        rest_server.start(process_events);
+        
+        // Start WebSocket server
+        ws_server.start();
+        
+        // Install signal handlers
+        std::signal(SIGINT, signal_handler);
+        std::signal(SIGTERM, signal_handler);
+        
+        spdlog::info(R"({{"msg":"siem_ready","rest_port":{},"ws_port":{}}})",
+                    config.rest.port, config.websocket_port);
+        
+        // Metrics flush thread
+        std::thread metrics_thread([&]() {
+            while (!shutdown_requested.load()) {
+                std::this_thread::sleep_for(std::chrono::seconds(60));
+                metrics.flush();
+                metrics.gauge("ws_clients", ws_server.client_count());
+            }
+        });
+        
+        // Main loop
+        while (!shutdown_requested.load()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        
+        // Shutdown
+        spdlog::info(R"({{"msg":"shutting_down"}})");
+        
+        change_watcher.stop();
+        ws_server.stop();
+        rest_server.stop();
+        
+        if (metrics_thread.joinable()) {
+            metrics_thread.join();
+        }
+        
+        metrics.flush();
+        
+        spdlog::info(R"({{"msg":"shutdown_complete"}})");
+        
+        return 0;
+        
+    } catch (const std::exception& e) {
+        spdlog::error(R"({{"msg":"fatal_error","error":"{}"}})", e.what());
+        std::cerr << "Fatal error: " << e.what() << std::endl;
+        return 1;
+    }
+}
+
