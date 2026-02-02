@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive SIEM - Live Incident Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #f56565;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .incidents-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .incidents-header {
+            background: #667eea;
+            color: white;
+            padding: 20px 30px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 20px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f7fafc;
+        }
+
+        tbody tr.new-incident {
+            animation: highlight 2s;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: #fef3c7; }
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-low {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .severity-medium {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .severity-high {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .severity-critical {
+            background: #feb2b2;
+            color: #742a2a;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-open {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .status-ack {
+            background: #e9d8fd;
+            color: #44337a;
+        }
+
+        .status-closed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: #a0aec0;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .timestamp {
+            color: #718096;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Cognitive SIEM</h1>
+            <div class="status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Connecting...</span>
+            </div>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalIncidents">0</div>
+                <div class="stat-label">Total Incidents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="openIncidents">0</div>
+                <div class="stat-label">Open Incidents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="criticalIncidents">0</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="eventsReceived">0</div>
+                <div class="stat-label">Events Received</div>
+            </div>
+        </div>
+
+        <div class="incidents-container">
+            <div class="incidents-header">Live Incidents</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Entity</th>
+                        <th>Anomaly Score</th>
+                        <th>Updated</th>
+                    </tr>
+                </thead>
+                <tbody id="incidentsTable">
+                    <tr class="empty-state">
+                        <td colspan="7">
+                            <div>Waiting for incidents...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        let incidents = new Map();
+        let eventsCount = 0;
+
+        function connect() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.hostname}:8081/stream`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                document.getElementById('statusText').textContent = 'Connected';
+                document.getElementById('statusDot').classList.remove('disconnected');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                } catch (error) {
+                    console.error('Failed to parse message:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                document.getElementById('statusText').textContent = 'Disconnected';
+                document.getElementById('statusDot').classList.add('disconnected');
+                
+                // Reconnect after 5 seconds
+                setTimeout(connect, 5000);
+            };
+        }
+
+        function handleMessage(data) {
+            eventsCount++;
+            document.getElementById('eventsReceived').textContent = eventsCount;
+
+            if (data.type === 'incident.insert' || data.type === 'incident.update' || data.type === 'incident.replace') {
+                const incident = data.doc;
+                const isNew = !incidents.has(incident._id);
+                incidents.set(incident._id, incident);
+                renderIncidents();
+                
+                if (isNew) {
+                    highlightRow(incident._id);
+                }
+            }
+
+            updateStats();
+        }
+
+        function renderIncidents() {
+            const tbody = document.getElementById('incidentsTable');
+            
+            if (incidents.size === 0) {
+                tbody.innerHTML = `
+                    <tr class="empty-state">
+                        <td colspan="7">
+                            <div>Waiting for incidents...</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const sortedIncidents = Array.from(incidents.values()).sort((a, b) => {
+                return b.updated_at - a.updated_at;
+            });
+
+            tbody.innerHTML = sortedIncidents.map(incident => `
+                <tr id="incident-${incident._id}">
+                    <td><code>${incident._id}</code></td>
+                    <td><strong>${incident.title || 'Unknown'}</strong></td>
+                    <td><span class="severity-badge severity-${incident.severity}">${incident.severity}</span></td>
+                    <td><span class="status-badge status-${incident.status}">${incident.status}</span></td>
+                    <td>${formatEntity(incident.entity)}</td>
+                    <td>${(incident.scores?.anomaly || 0).toFixed(2)}</td>
+                    <td class="timestamp">${formatTimestamp(incident.updated_at)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function formatEntity(entity) {
+            if (!entity) return '-';
+            const parts = [];
+            if (entity.host) parts.push(entity.host);
+            if (entity.ip) parts.push(entity.ip);
+            if (entity.user) parts.push(entity.user);
+            return parts.join(' / ') || '-';
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '-';
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleString();
+        }
+
+        function highlightRow(incidentId) {
+            setTimeout(() => {
+                const row = document.getElementById(`incident-${incidentId}`);
+                if (row) {
+                    row.classList.add('new-incident');
+                    setTimeout(() => row.classList.remove('new-incident'), 2000);
+                }
+            }, 100);
+        }
+
+        function updateStats() {
+            document.getElementById('totalIncidents').textContent = incidents.size;
+            
+            let open = 0, critical = 0;
+            for (const incident of incidents.values()) {
+                if (incident.status === 'open') open++;
+                if (incident.severity === 'critical') critical++;
+            }
+            
+            document.getElementById('openIncidents').textContent = open;
+            document.getElementById('criticalIncidents').textContent = critical;
+        }
+
+        // Initial connection
+        connect();
+
+        // Fetch existing incidents from REST API
+        fetch(`http://${window.location.hostname}:8080/incidents`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(incident => {
+                    incidents.set(incident._id, incident);
+                });
+                renderIncidents();
+                updateStats();
+            })
+            .catch(err => console.error('Failed to load incidents:', err));
+    </script>
+</body>
+</html>
+
