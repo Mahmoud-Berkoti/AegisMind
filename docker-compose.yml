@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: siem-mongodb
+    ports:
+      - "27017:27017"
+    command: mongod --replSet rs0
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: cog_siem
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }" | mongosh --quiet
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    networks:
+      - siem-network
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  siem-network:
+    driver: bridge
+
